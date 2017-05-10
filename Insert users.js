@@ -1,8 +1,9 @@
- // This file only populates the mongo database
+//  // This file only populates the mongo database
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
+var roommatedb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
     // connect to mongoDB database on modulus.io
+roommatedb.on('error', console.error.bind(console, 'connection error: '));
 
 var roommateSchema = mongoose.Schema({
     roommate_name: String,
@@ -18,13 +19,11 @@ var choreSchema = mongoose.Schema({
     next_roommate: String
 });
 
-var roommate = mongoose.model('roommate', roommateSchema);
+var roommate = roommatedb.model('roommate', roommateSchema);
 
 
 // clear table before inserting new documents
-mongoose.connection.collections['roommates'].drop( function(err) {
-    console.log('collection dropped');
-});
+roommate.remove({}, ()=>{});
 
 
 // Insert roommates
@@ -48,25 +47,24 @@ Dayna.save (function (err,res) {
 
 // Insert chores
 
-// mongoose.connect('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/chores');     // connect to mongoDB database on modulus.io
+choresdb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/chores');     // connect to mongoDB database on modulus.io
 
-// mongoose.connection.collections['chores'].drop( function(err) {
-// console.log('collection dropped');
-// });
+var chores = choresdb.model('Chores', choreSchema);
 
-// var chores = mongoose.model('Chores', choreSchema);
+// clear table before inserting new documents
+chores.remove({}, ()=>{});
 
-// var bathroom = new chores ({ chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : '1'});
-// bathroom.save(function (err,res) {
-// 	if (err) return console.error(err);
-// });
-
+var bathroom = new chores ({ chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : '1'});
+bathroom.save(function (err,res) {
+	if (err) return console.error(err);
+});
 
 
-// roommate.find( function (err, results) {
-// 	if ( err) return console.error(err);
-// 	console.log(results);
-// })
+
+roommate.find( function (err, results) {
+	if ( err) return console.error(err);
+	console.log(results);
+})
 
 
 // console.log(garrett.roommate_name);
