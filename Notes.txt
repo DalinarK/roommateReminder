@@ -1,0 +1,22 @@
+Used this tutorial: 
+https://scotch.io/tutorials/creating-a-single-page-todo-app-with-node-and-angular
+
+Exceptions: For the time being, I used local hosted version of mongodb rather than the service used in the tutorial. 
+
+As a result, I downloaded and started mongo services and pointed the server.js file to mongoose.connect('mongodb://localhost/roommate')
+Instructions for installing/running Mongodb service: 
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+For the server to be able to receive text messages from the server, you need a webhook as explaiend on the twilo website. Before we do it on a server, I am using ngrok so that the localhost can still recieve webhooks
+
+https://www.twilio.com/blog/2013/10/test-your-webhooks-locally-with-ngrok.html
+webhook implementaiton using node
+https://derickbailey.com/2016/03/14/properly-handling-webhooks-with-node-and-express/
+
+
+
+
+Features wanted:
+
+Every week will text person to do chore. When person texts done, will wait 7 days to text next person
+Will schedule next person when 
