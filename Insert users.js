@@ -4,21 +4,21 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
     // connect to mongoDB database on modulus.io
 
-var roommateSchema = new mongoose.Schema({
+var roommateSchema = mongoose.Schema({
     roommate_name: String,
     rotation_number: Number,
     roommate_phone_number: String   
 });
 
 
-var choreSchema = new mongoose.Schema({
+var choreSchema = mongoose.Schema({
     chore_name: String,
     chore_frequency: Number, //once per X amount of days
     date_last_cleaned: Date,
     next_roommate: String
 });
 
-var roommate = mongoose.model('roommateSchema', roommateSchema);
+var roommate = mongoose.model('roommate', roommateSchema);
 
 
 // clear table before inserting new documents
