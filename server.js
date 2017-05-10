@@ -16,7 +16,8 @@
 
     // configuration =================
 
-    mongoose.connect('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
+    var roommatedb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
+    var choresdb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/chores')
 
     app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
     app.use(morgan('dev'));                                         // log every request to the console
@@ -46,8 +47,8 @@
         next_roommate: String
     });
 
-    var roommate = mongoose.model('Roommate', roommateSchema);
-    var chores = mongoose.model('Chores', choreSchema);
+    var roommate = roommatedb.model('Roommate', roommateSchema);
+    var chores = choresdb.model('Chores', choreSchema);
 
     // update list of chores ==================================
     // at the momement only updates when server is restarted
@@ -161,7 +162,7 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('42 22 * * *', () =>{
+     cron.schedule ('48 22 * * *', () =>{
         chores.find((err,chore) => {
             chore.forEach((record) =>{
                 // Check to see if chore needs to be done
