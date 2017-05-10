@@ -224,5 +224,7 @@
         });
     }
 
+    textRoommate('+15039614746', 'sent form aws server');
+
     console.log("App listening on port 8080");
 
