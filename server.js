@@ -11,7 +11,7 @@
     // var twilio = require('twilio'); //SMS component
     var accountSid = 'AC202eca383c9dd9255d5fa02643fd9e56'; // Your Account SID from www.twilio.com/console
     var authToken = '203e143006d535e8519c4031562c60b8';   // Your Auth Token from www.twilio.com/console
-    // var client = new twilio.RestClient(accountSid, authToken);
+    var client = require('twilio')(accountSid, authToken); 
 
     var cron = require ('node-cron'); //Time scheduler
 
