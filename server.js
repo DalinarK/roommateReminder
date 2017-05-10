@@ -161,7 +161,7 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('54 15 * * *', () =>{
+     cron.schedule ('42 22 * * *', () =>{
         chores.find((err,chore) => {
             chore.forEach((record) =>{
                 // Check to see if chore needs to be done
