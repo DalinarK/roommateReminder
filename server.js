@@ -16,8 +16,8 @@
 
     // configuration =================
 
-    var roommatedb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates');     // connect to mongoDB database on modulus.io
-    var choresdb = mongoose.createConnection('mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/chores')
+    var roommatedb = mongoose.createConnection('mongodb://localhost/roommate');     // connect to mongoDB database on modulus.io
+    var choresdb = mongoose.createConnection('mongodb://localhost/roommate')
 
     app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
     app.use(morgan('dev'));                                         // log every request to the console
