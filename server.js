@@ -99,12 +99,44 @@
                     // find out the rotation number for the next roommate
                     var rotationNumber = chore.next_roommate;
                     // find out the rotation number
-                    roommate.findOne({'rotation_number' : rotationNumber}, (err, roommate) => {
-                        var roommateNumber = roommate.roommate_phone_number;
+                    roommate.findOne({'rotation_number' : rotationNumber}, (err, roommateResult) => {
+                        var roommateNumber = roommateResult.roommate_phone_number;
                         // compare the phone number of the sender with the phone number of the person that's assigned the chore
+                        console.log(roommateNumber + ' vs ' + req.body.From);
                         if (roommateNumber === req.body.From)
                         {
                             console.log("phone numbers match!");
+                            console.log(`chore rotation is ${chore.next_roommate}`);
+                            roommatedb.count((err,totalRoommates) => {
+                                console.log('number of roommates ' + totalRoommates + ' next rooomate is ' + chore.next_roommate);
+                                if ((parseInt(chore.next_roommate) + 1) > totalRoommates) //resets to first roommate because the rotation has wrapped back to the first roommate
+                                {
+                                    var total = parseInt(chore.next_roommate) + 1;
+                                    console.log('resetting rotation to first roommate' + total);
+                                    nextRotation = 1;
+                                }
+                                else
+                                {
+                                    nextRotation = parseInt(chore.next_roommate) + 1; //sets to the next roommate
+                                    console.log(`next rotation is ${nextRotation}`);
+                                }
+
+                                // update the for the next rotation/last cleaned
+                                chores.findOne({'chore_name': receivedText} , (err, chore) => {
+                                    chore.next_roommate = nextRotation;
+                                    chore.date_last_cleaned = Date.now();
+                                    chore.save((err, updatedRotation) => {
+                                        if (err) return handleError(err);
+                                        res.send(updatedRotation);
+                                        console.log("updated rotation");
+                                    })
+                                })
+
+                            });
+                        }
+                        else
+                        {
+                            console.log("phone numbers don't match!")
                         }
                     });
 
@@ -116,33 +148,7 @@
 
                 // //looks up the chore name 
                 // chores.findOne({'chore_name': receivedText}, (err, chore) => {
-                //     console.log(`chore rotation is ${chore.next_roommate}`);
-                //     roommate.count({}, (err,totalRoommates) => {
-                //         console.log('number of roommates ' + totalRoommates + ' next rooomate is ' + chore.next_roommate);
-                //         if ((parseInt(chore.next_roommate) + 1) > totalRoommates) //resets to first roommate because the rotation has wrapped back to the first roommate
-                //         {
-                //             var total = parseInt(chore.next_roommate) + 1;
-                //             console.log('resetting rotation to first roommate' + total);
-                //             nextRotation = 1;
-                //         }
-                //         else
-                //         {
-                //             nextRotation = parseInt(chore.next_roommate) + 1; //sets to the next roommate
-                //             console.log(`next rotation is ${nextRotation}`);
-                //         }
-
-                //         // update the for the next rotation/last cleaned
-                //         chores.findOne({'chore_name': receivedText} , (err, chore) => {
-                //             chore.next_roommate = nextRotation;
-                //             chore.date_last_cleaned = Date.now();
-                //             chore.save((err, updatedRotation) => {
-                //                 if (err) return handleError(err);
-                //                 res.send(updatedRotation);
-                //                 console.log("updated rotation");
-                //             })
-                //         })
-
-                //     });
+                //     
                 // });
                 
                 // adds one to rotation then does modulus
