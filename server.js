@@ -7,12 +7,16 @@
     var morgan = require('morgan');             // log requests to the console (express4)
     var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
     var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
+    var fs = require("fs");
+    var authentication = fs.readFileSync("authentication.json");
+    var JSONauth= JSON.parse(authentication);
 
-    var accountSid = 'AC202eca383c9dd9255d5fa02643fd9e56'; // Your Account SID from www.twilio.com/console
-    var authToken = '203e143006d535e8519c4031562c60b8';   // Your Auth Token from www.twilio.com/console
+    var accountSid = String(JSONauth.twilio_SID); // Your Account SID from www.twilio.com/console
+    var authToken = String(JSONauth.twilio_auth);   // Your Auth Token from www.twilio.com/console
     var client = require('twilio')(accountSid, authToken); 
 
     var cron = require ('node-cron'); //Time scheduler
+
 
     // configuration =================
 
@@ -106,7 +110,7 @@
                         }
 
                         // update the for the next rotation/last cleaned
-                        chores.findOne({'chore_name': 'BATHROOM'} , (err, chore) => {
+                        chores.findOne({'chore_name': receivedText} , (err, chore) => {
                             chore.next_roommate = nextRotation;
                             chore.date_last_cleaned = Date.now();
                             chore.save((err, updatedRotation) => {
@@ -162,7 +166,7 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('48 22 * * *', () =>{
+     cron.schedule ('34 14 * * *', () =>{
         chores.find((err,chore) => {
             chore.forEach((record) =>{
                 // Check to see if chore needs to be done
