@@ -21,7 +21,6 @@
     // configuration =================
 
     var roommatedb = mongoose.createConnection('mongodb://localhost/roommate');     // connect to mongoDB database on modulus.io
-    var choresdb = mongoose.createConnection('mongodb://localhost/chores')
 
     app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
     app.use(morgan('dev'));                                         // log every request to the console
@@ -51,18 +50,24 @@
         next_roommate: String
     });
 
-    var roommate = roommatedb.model('Roommate', roommateSchema);
-    var chores = choresdb.model('Chores', choreSchema);
+    var roommates = roommatedb.model('Roommate', roommateSchema);
+    var chores = roommatedb.model('Chores', choreSchema);
 
     // update list of chores ==================================
     // at the momement only updates when server is restarted
     var choreArray = []; 
     chores.find((err, results) => {
         results.forEach( (record) => {
-            // console.log(record.chore_name);
+            console.log(record.chore_name);
             choreArray.push(record.chore_name);
         })
     })
+
+    roommates.find((err,results) => {
+        results.forEach((record) =>{
+            console.log(record.roommate_name);
+        });
+    });
 
     // routes ======================================================================
 
@@ -98,8 +103,10 @@
                 chores.findOne({'chore_name': receivedText}, (err, chore) => {
                     // find out the rotation number for the next roommate
                     var rotationNumber = chore.next_roommate;
+
                     // find out the rotation number
                     roommate.findOne({'rotation_number' : rotationNumber}, (err, roommateResult) => {
+                        console.log("queried roommate number and got:" + rotationNumber + " " + err);
                         var roommateNumber = roommateResult.roommate_phone_number;
                         // compare the phone number of the sender with the phone number of the person that's assigned the chore
                         console.log(roommateNumber + ' vs ' + req.body.From);
