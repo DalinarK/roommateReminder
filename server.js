@@ -163,10 +163,13 @@
                                     })
                                 }                      
 
+                                                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for !!!" + receivedText);
+                                textRoommate(req.body.From, "Thank you! " + receivedText + " has been marked as finished!");
+
                             }
                             else
                             {
-                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for " + receivedText);
+                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for !!!" + receivedText);
                             }
                         })
                    });
