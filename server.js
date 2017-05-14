@@ -120,7 +120,7 @@
 // Input: MongoDB database object, a string representing the chore we are looking for, callback function
 // Output: object of the chore found in the chore collection that matches the string parameter
 // Purpose: Find the chore object in the MongoDB chores collection that matches the choreName parameter and returns that chore object. 
-   // Returns the chore by name
+// Returns the chore by name
     var findChore = function (db, choreName, callback) {
         var collection = db.collection('chores');
         collection.find({'chore_name' : choreName}).toArray((err, docs) => {
@@ -200,76 +200,14 @@
                             }
                         })
                    });
-                    
+                   
                 })
-
-
-                // Look up chore_name in chores DB
-                // chores.findOne({'chore_name': receivedText}, (err, chore) => {
-                //     // find out the rotation number for the next roommate
-                //     var rotationNumber = chore.next_roommate;
-
-                //     // find out the rotation number
-                //     roommate.findOne({'rotation_number' : rotationNumber}, (err, roommateResult) => {
-                //         console.log("queried roommate number and got:" + rotationNumber + " " + err);
-                //         var roommateNumber = roommateResult.roommate_phone_number;
-                //         // compare the phone number of the sender with the phone number of the person that's assigned the chore
-                //         console.log(roommateNumber + ' vs ' + req.body.From);
-                //         if (roommateNumber === req.body.From)
-                //         {
-                //             console.log("phone numbers match!");
-                //             console.log(`chore rotation is ${chore.next_roommate}`);
-                //             roommatedb.count((err,totalRoommates) => {
-                //                 console.log('number of roommates ' + totalRoommates + ' next rooomate is ' + chore.next_roommate);
-                //                 if ((parseInt(chore.next_roommate) + 1) > totalRoommates) //resets to first roommate because the rotation has wrapped back to the first roommate
-                //                 {
-                //                     var total = parseInt(chore.next_roommate) + 1;
-                //                     console.log('resetting rotation to first roommate' + total);
-                //                     nextRotation = 1;
-                //                 }
-                //                 else
-                //                 {
-                //                     nextRotation = parseInt(chore.next_roommate) + 1; //sets to the next roommate
-                //                     console.log(`next rotation is ${nextRotation}`);
-                //                 }
-
-                //                 // update the for the next rotation/last cleaned
-                //                 chores.findOne({'chore_name': receivedText} , (err, chore) => {
-                //                     chore.next_roommate = nextRotation;
-                //                     chore.date_last_cleaned = Date.now();
-                //                     chore.save((err, updatedRotation) => {
-                //                         if (err) return handleError(err);
-                //                         res.send(updatedRotation);
-                //                         console.log("updated rotation");
-                //                     })
-                //                 })
-
-                //             });
-                //         }
-                //         else
-                //         {
-                //             console.log("phone numbers don't match!")
-                //         }
-                //     });
-
-                // })
-                
-                // look up the rotation number in roommate db
-                // compare roommate phone number with received number
-                // if true then update. else send error saying it's not their turn.
-
-                // //looks up the chore name 
-                // chores.findOne({'chore_name': receivedText}, (err, chore) => {
-                //     
-                // });
-                
-                // adds one to rotation then does modulus
-
             }
             else{
                 console.log( `received message from ${req.body.From}`);
                 textRoommate(req.body.From, 'Invalid response! Please use the previous text\'s done phrase when finished with your chore');
             }
+            db.close(); 
        });
         console.log(stringCompare);
     })
@@ -306,36 +244,61 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('56 15 * * *', () =>{
-        chores.find((err,chore) => {
-            chore.forEach((record) =>{
-                // Check to see if chore needs to be done
-                var currentDate = new Date();
-                var lastCleaned = record.date_last_cleaned;
-                var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
-                var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
-                var choreName = record.chore_name;
-                console.log ("Hours since cleaned is " + daysSinceCleaned + " date: " + lastCleaned);
+     cron.schedule ('38 19 * * *', () =>{
 
-                var roommateRotation = record.next_roommate;
+        MongoClient.connect(url, (err, db) => {
+            assert.equal(null, err);
+            var collection = db.collection('chores');
+            collection.find({}, (err, docs) =>{
+                docs.forEach((record) =>{
+                    // Check to see if chore needs to be done
+                    var currentDate = new Date();
+                    var lastCleaned = record.date_last_cleaned;
+                    var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
+                    var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
+                    var choreName = record.chore_name;
+                    console.log ("Hours since cleaned is " + daysSinceCleaned + " date: " + lastCleaned);
+
+                    var roommateRotation = record.next_roommate;
+                    
+                    dispatchChore(db, roommateRotation, choreName);
+
+                });
+            })
+        })
+        // chores.find((err,chore) => {
+        //     chore.forEach((record) =>{
+        //         // Check to see if chore needs to be done
+        //         var currentDate = new Date();
+        //         var lastCleaned = record.date_last_cleaned;
+        //         var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
+        //         var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
+        //         var choreName = record.chore_name;
+        //         console.log ("Hours since cleaned is " + daysSinceCleaned + " date: " + lastCleaned);
+
+        //         var roommateRotation = record.next_roommate;
                 
-                dispatchChore(roommateRotation, choreName);
+        //         dispatchChore(roommateRotation, choreName);
 
-            });
-        });
+        //     });
+        // });
      });
 // Input: String that refers to the current member of rotation, and name of the chore
 // Output: Calls textroommate:
 // Purpose: looks up the roommates document in Mongodb using the rotation number and then uses that information to call textRoommate function.
     // Pulls up roommate based on their rotation number
-    function dispatchChore(roommateRotation, choreName){
+    function dispatchChore(db, roommateRotation, choreName){
 
         var chore = 'default chore';
-        roommate.findOne({'rotation_number': roommateRotation}, (err, person) =>{ //using the rotation number, find the phone number of the roommate that needs chore done.
-            if (err) return callback(err);
-            textRoommate(person.roommate_phone_number,`***Beep Boop*** ${person.roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
 
+        findRoommate(db, roommateRotation, (roommateResult) => {
+            textRoommate(roommateResult[0].roommate_phone_number,`***Beep Boop*** ${roommateResult[0].roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
         });
+        // roommate.findOne({'rotation_number': roommateRotation}, (err, person) =>{ //using the rotation number, find the phone number of the roommate that needs chore done.
+        //     if (err) return callback(err);
+        //     textRoommate(person.roommate_phone_number,`***Beep Boop*** ${person.roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
+
+        // });
     }
 // Input: string with telephone number structured as '+********', string with intended text message
 // Output: contacts Twilio API and sends out text message to recipient and message.
