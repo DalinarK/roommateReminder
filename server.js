@@ -60,10 +60,14 @@
     // update list of chores ==================================
     // at the momement only updates when server is restarted
     var choreArray = []; 
+    var numberOfRoommates;
+
     MongoClient.connect(url, (err, db) => {
         assert.equal(null, err);
         findAllChores(db, ()=> {
-            db.close();
+            findTotalRoommates(db, () => {
+                db.close();
+            })        
         })
     });
 
@@ -75,7 +79,17 @@
                 choreArray.push(record.chore_name);
                 console.log ("adding to choreArray " + record.chore_name);
             });
-        })
+            callback();
+        });
+    }
+
+    var findTotalRoommates = (db, callback) =>{
+        var collection = db.collection('roommate');
+        collection.find({}).toArray((err, docs) =>{
+            assert.equal(err, null);
+            numberOfRoommates = docs.length;
+            console.log("number of roommates is " + numberOfRoommates);
+        });
     }
 
 
@@ -122,7 +136,8 @@
 // Purpose: Find roommate object in the mongoDB roommate collection that matches the rotationNumber and returns that roommate.
     var findRoommate = function(db, rotationNumber, callback) {
         var collection = db.collection('roommate');
-        collection.find({'rotation_number' : '1'}).toArray((err,docs) => {
+        console.log ("rotation number is " + rotationNumber);
+        collection.find({'rotation_number' : rotationNumber}).toArray((err,docs) => {
             assert.equal (err, null);
             assert.equal (1, docs.length); //only supposed to return one resutl per roommate IE no roommate should have the same rotation number
             console.log("found " + docs[0].roommate_name);
@@ -163,14 +178,15 @@
                             if(req.body.From === resultsRoommate[0].roommate_phone_number)
                             {
                                 console.log("phone numbers match! marking chore as done.");
+                                console.log (`total roommates: ${numberOfRoommates} current rotation number ${resultsChore.next_roommate}`);
                                 // increments the next roommate rotation in chores by 1. If the current number is the last roommate in the rotation, reset next rotation to 1
-                                if(resultsRoommate.length <= resultsChore.next_roommate){
+                                if(numberOfRoommates <= resultsChore.next_roommate){
                                     updateChoreRotation (db, receivedText, 1, () => {
                                         console.log("reset next roommate to 1");
                                     })
                                 }
                                 else{
-                                    var updatedRotation = parseInt(resultsChore.next_roomate) + 1;
+                                    var updatedRotation = Number(resultsChore.next_roommate) + 1;
                                     console.log("this will be the next rotation" + updatedRotation);
                                     updateChoreRotation(db, receivedText, updatedRotation, () =>{
                                         console.log("set next roommate to next " + updatedRotation);
@@ -180,7 +196,7 @@
                             }
                             else
                             {
-                                textRoommate(textRoommate, "!!!! Error. You are not currently on the rotation for " + receivedText);
+                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for " + receivedText);
                             }
                         })
                    });

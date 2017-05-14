@@ -14,7 +14,7 @@ var insertRoommates = function(db, callback) {
       if(!err) {
           console.log( 'roommate' + " dropped");
           collection.insertMany([
-            {roommate_name : 'Garrett', rotation_number : '1', roommate_phone_number: '+15039614746'}, {roommate_name : 'Kitt', rotation_number : '2', roommate_phone_number: '+12092102783'}, {roommate_name : 'Dayna', rotation_number : '3', roommate_phone_number: '+12092102783'}
+            {roommate_name : 'Garrett', rotation_number : 1 , roommate_phone_number: '+15039614746'}, {roommate_name : 'Kitt', rotation_number : 2, roommate_phone_number: '+12092102783'}, {roommate_name : 'Dayna', rotation_number : 3, roommate_phone_number: '+12092102783'}
           ], function(err, result) {
             assert.equal(err, null);
             console.log("Inserted documents into the collection");
@@ -22,7 +22,7 @@ var insertRoommates = function(db, callback) {
           });
       } else {
             collection.insertMany([
-            {roommate_name : 'Garrett', rotation_number : '1', roommate_phone_number: '+15039614746'}, {roommate_name : 'Kitt', rotation_number : '2', roommate_phone_number: '+12092102783'}, {roommate_name : 'Dayna', rotation_number : '3', roommate_phone_number: '+12092102783'}
+            {roommate_name : 'Garrett', rotation_number : 1 , roommate_phone_number: '+15039614746'}, {roommate_name : 'Kitt', rotation_number : 2, roommate_phone_number: '+12092102783'}, {roommate_name : 'Dayna', rotation_number : 3, roommate_phone_number: '+12092102783'}
           ], function(err, result) {
             assert.equal(err, null);
             console.log("Inserted documents into the collection");
@@ -35,7 +35,7 @@ var insertRoommates = function(db, callback) {
       if(!err) {
           console.log( 'chores' + " dropped");
           choresCollection.insertMany([
-            {chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : '1'}
+            {chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : 1}
           ], function(err, result) {
             assert.equal(err, null);
             console.log("Inserted documents into the collection");
@@ -44,7 +44,7 @@ var insertRoommates = function(db, callback) {
       } else {
           console.log("!ERROR! " + err.errmsg);
           choresCollection.insertMany([
-            {chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : '1'}
+            {chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : 1}
           ], function(err, result) {
             assert.equal(err, null);
             console.log("Inserted documents into the collection");
