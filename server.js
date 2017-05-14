@@ -3,7 +3,6 @@
     // set up ========================
     var express  = require('express');
     var app      = express();                               // create our app w/ express
-    var mongoose = require('mongoose');                     // mongoose for mongodb
     var morgan = require('morgan');             // log requests to the console (express4)
     var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
     var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
@@ -23,10 +22,6 @@
         , assert = require('assert');
 
     var url = 'mongodb://localhost/roommate';
-
-    var roommatedb = mongoose.createConnection('mongodb://localhost/roommate');     // connect to mongoDB database on modulus.io
-
-
     var MongoClient = require('mongodb').MongoClient;
 
     app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
@@ -38,24 +33,6 @@
 
     //  Constants ==================
     var TwilioNumber = '+19162457984';
-
-    // define model =================
-
-    var roommateSchema = mongoose.Schema({
-        roommate_name: String,
-        rotation_number: Number,
-        roommate_phone_number: String   
-    });
-
-    var choreSchema = mongoose.Schema({
-        chore_name: String,
-        chore_frequency: Number,
-        date_last_cleaned: Date,
-        next_roommate: String
-    });
-
-    var roommates = roommatedb.model('roommate', roommateSchema);
-    var chores = roommatedb.model('chores', choreSchema);
 
     // update list of chores ==================================
     // at the momement only updates when server is restarted
@@ -92,13 +69,6 @@
         });
     }
 
-
-
-    roommates.find((err,results) => {
-        results.forEach((record) =>{
-            console.log(record.roommate_name);
-        });
-    });
 
     // routes ======================================================================
 
@@ -160,7 +130,7 @@
     app.post('/api/todos/textresponse/', (req, res) => {
 
         var nextRotation;
-        var receivedText = String(req.body.Body).toUpperCase();
+        var receivedText = String(req.body.Body).toUpperCase().trim();
         console.log(receivedText);
        
     //check to see if the chore is actually one of the chores on the list
@@ -200,14 +170,12 @@
                             }
                         })
                    });
-                   
                 })
             }
             else{
                 console.log( `received message from ${req.body.From}`);
                 textRoommate(req.body.From, 'Invalid response! Please use the previous text\'s done phrase when finished with your chore');
             }
-            db.close(); 
        });
         console.log(stringCompare);
     })
