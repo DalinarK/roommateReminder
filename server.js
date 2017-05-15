@@ -234,21 +234,23 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('37 12 * * *', () =>{
+     cron.schedule ('05 13 * * *', () =>{
 
         MongoClient.connect(url, (err, db) => {
             assert.equal(null, err);
             var collection = db.collection('chores');
             collection.find({}, (err, docs) =>{
                 docs.forEach((record) =>{
-                    // Check to see if chore needs to be done
+                    // Check to see if chore needs to be done.
                     var currentDate = new Date();
-                    var lastCleaned = record.date_last_cleaned;
+                    var lastCleaned = new Date (record.date_last_cleaned);
                     var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
-                    var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
+                    var daysSinceCleaned = Math.abs(currentDate.getTime() - lastCleaned.getTime())/(86400000);
                     var choreName = record.chore_name;
-                    console.log ("Days since cleaned is " + daysSinceCleaned + " date: " + lastCleaned + "min interval is " + cleanInterval);
 
+                    console.log ("last cleaned is: " + lastCleaned + "from query: " + record.date_last_cleaned);
+                    console.log ("todays date is: " + currentDate);
+                    console.log ("Interval is: " + cleanInterval + " Difference is " + daysSinceCleaned);
                     var roommateRotation = record.next_roommate;
                     if (daysSinceCleaned > cleanInterval)
                     {
