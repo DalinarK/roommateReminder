@@ -13,6 +13,7 @@
     var accountSid = String(JSONauth.twilio_SID); // Your Account SID from www.twilio.com/console
     var authToken = String(JSONauth.twilio_auth);   // Your Auth Token from www.twilio.com/console
     var client = require('twilio')(accountSid, authToken); 
+    var mongoURL = String(JSONauth.mongoCreds);
 
     var cron = require ('node-cron'); //Time scheduler
 
@@ -21,7 +22,7 @@
     var MognoClient = require('mongodb').MognoClient
         , assert = require('assert');
 
-    var url = 'mongodb://localhost/roommate';
+    var url = mongoURL;
     var MongoClient = require('mongodb').MongoClient;
 
     app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
