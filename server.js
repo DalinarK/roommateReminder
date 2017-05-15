@@ -187,7 +187,7 @@
                                 }
                                 else
                                 {
-                                    textRoommate(req.body.From, `!!!! Error. You are not currently on the rotation for ${receivedText} !!!`);
+                                    textRoommate(req.body.From, `!!!! Error. You are not currently on the rotation for ${receivedText} Type "status" to who is currently assigned !!!`);
                                 }
                             })
                        });
