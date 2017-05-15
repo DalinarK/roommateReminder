@@ -2,8 +2,7 @@ var MongoClient = require('mongodb').MongoClient
   , assert = require('assert');
 
 // Connection URL
-var url = 'mongodb://localhost:27017/roommate';
-var choreUrl = 'mongodb://localhost:27017/chores';
+var url = 'mongodb://remoteAdmin:gopher1@ec2-34-210-80-219.us-west-2.compute.amazonaws.com:27017/roommates';
 
 var insertRoommates = function(db, callback) {
   // Get the documents collection
@@ -73,39 +72,3 @@ MongoClient.connect(url, function(err, db) {
     db.close();
   });
 });
-
-
-// var insertChores = function(db, callback) {
-//   // Get the documents collection
-//   var collection = db.collection('chores');
-
-//   // clear table before inserting new documents
-//   db.dropCollection('chores', function(err) {
-//       if(!err) {
-//           console.log( 'chores' + " dropped");
-//           collection.insertMany([
-//             {chore_name : 'BATHROOM', chore_frequency: '36000', date_last_cleaned: Date('04/24/2017'), next_roommate : '1'}
-//           ], function(err, result) {
-//             assert.equal(err, null);
-//             console.log("Inserted documents into the collection");
-//             callback(result);
-
-//           });
-//       } else {
-//           console.log("!ERROR! " + err.errmsg);
-//       }
-//   });
-
-//   // Insert some documents
-
-// }
-
-
-// MongoClient.connect(choreUrl, function(err, db) {
-//   assert.equal(null, err);
-//   console.log("Connected successfully to server");
-
-//   insertChores(db, function() {
-//     db.close();
-//   });
-// });
