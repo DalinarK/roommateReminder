@@ -283,6 +283,7 @@
 
         findRoommate(db, roommateRotation, (roommateResult) => {
             textRoommate(roommateResult[0].roommate_phone_number,`***Beep Boop*** ${roommateResult[0].roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
+            textRoommate('+15039614746',`***Beep Boop*** ${roommateResult[0].roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
         });
         // roommate.findOne({'rotation_number': roommateRotation}, (err, person) =>{ //using the rotation number, find the phone number of the roommate that needs chore done.
         //     if (err) return callback(err);
