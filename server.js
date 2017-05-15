@@ -234,7 +234,7 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('38 19 * * *', () =>{
+     cron.schedule ('37 12 * * *', () =>{
 
         MongoClient.connect(url, (err, db) => {
             assert.equal(null, err);
@@ -247,31 +247,17 @@
                     var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
                     var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
                     var choreName = record.chore_name;
-                    console.log ("Hours since cleaned is " + daysSinceCleaned + " date: " + lastCleaned);
+                    console.log ("Days since cleaned is " + daysSinceCleaned + " date: " + lastCleaned + "min interval is " + cleanInterval);
 
                     var roommateRotation = record.next_roommate;
-                    
-                    dispatchChore(db, roommateRotation, choreName);
+                    if (daysSinceCleaned > cleanInterval)
+                    {
+                        dispatchChore(db, roommateRotation, choreName);
+                    }
 
                 });
             })
         })
-        // chores.find((err,chore) => {
-        //     chore.forEach((record) =>{
-        //         // Check to see if chore needs to be done
-        //         var currentDate = new Date();
-        //         var lastCleaned = record.date_last_cleaned;
-        //         var cleanInterval = record.chore_frequency; //remember to convert to days right now its set to minutes when done testing
-        //         var daysSinceCleaned = Math.abs(currentDate - lastCleaned)/(86400000);
-        //         var choreName = record.chore_name;
-        //         console.log ("Hours since cleaned is " + daysSinceCleaned + " date: " + lastCleaned);
-
-        //         var roommateRotation = record.next_roommate;
-                
-        //         dispatchChore(roommateRotation, choreName);
-
-        //     });
-        // });
      });
 // Input: String that refers to the current member of rotation, and name of the chore
 // Output: Calls textroommate:
