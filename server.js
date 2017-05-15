@@ -132,55 +132,75 @@
         var nextRotation;
         var receivedText = String(req.body.Body).toUpperCase().trim();
         console.log(receivedText);
-       
-    //check to see if the chore is actually one of the chores on the list
-        verifyChore(receivedText, ()=>{
-            if (stringCompare === true){
 
-                MongoClient.connect(url, (err, db) => {
-                    assert.equal(null, err);
-
-                    findChore(db, receivedText, (resultsChore)=>{
-                        console.log("findChore callback result: " + resultsChore.chore_name + " " + resultsChore.next_roommate);
+    // If the received message is STATUS, then the app will text the current person supposed to do chore
+        if (receivedText.toUpperCase() === "STATUS")
+        {
+            MongoClient.connect(url, (err, db) =>{
+                assert.equal(null, err);
+                choreArray.forEach((record) => {
+                    findChore(db, record, (resultsChore) =>{
+                        console.log(`Requested status of ${resultsChore.chore_name}`);
                         findRoommate(db, resultsChore.next_roommate, (resultsRoommate) =>{
-                            console.log("findRoommate callback result: " + resultsRoommate[0].roommate_name);
-                            // make sure that the person that sent this text is the person is the person listed on the chore rotation
-                            if(req.body.From === resultsRoommate[0].roommate_phone_number)
-                            {
-                                console.log("phone numbers match! marking chore as done.");
-                                console.log (`total roommates: ${numberOfRoommates} current rotation number ${resultsChore.next_roommate}`);
-                                // increments the next roommate rotation in chores by 1. If the current number is the last roommate in the rotation, reset next rotation to 1
-                                if(numberOfRoommates <= resultsChore.next_roommate){
-                                    updateChoreRotation (db, receivedText, 1, () => {
-                                        console.log("reset next roommate to 1");
-                                    })
-                                }
-                                else{
-                                    var updatedRotation = Number(resultsChore.next_roommate) + 1;
-                                    console.log("this will be the next rotation" + updatedRotation);
-                                    updateChoreRotation(db, receivedText, updatedRotation, () =>{
-                                        console.log("set next roommate to next " + updatedRotation);
-                                    })
-                                }                      
-
-                                                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for !!!" + receivedText);
-                                textRoommate(req.body.From, "Thank you! " + receivedText + " has been marked as finished!");
-
-                            }
-                            else
-                            {
-                                textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for !!!" + receivedText);
-                            }
+                            console.log(`Current roommate is ${resultsRoommate[0].roommate_name}`);
+                            textRoommate(req.body.From, `The person assigned to chore: ${resultsChore.chore_name} is ${resultsRoommate[0].roommate_name}`);
                         })
-                   });
+
+                    })
                 })
-            }
-            else{
-                console.log( `received message from ${req.body.From}`);
-                textRoommate(req.body.From, 'Invalid response! Please use the previous text\'s done phrase when finished with your chore');
-            }
-       });
-        console.log(stringCompare);
+            })      
+        }
+        else
+        {       
+    //check to see if the chore is actually one of the chores on the list
+            verifyChore(receivedText, ()=>{
+                if (stringCompare === true){
+
+                    MongoClient.connect(url, (err, db) => {
+                        assert.equal(null, err);
+
+                        findChore(db, receivedText, (resultsChore)=>{
+                            console.log("findChore callback result: " + resultsChore.chore_name + " " + resultsChore.next_roommate);
+                            findRoommate(db, resultsChore.next_roommate, (resultsRoommate) =>{
+                                console.log("findRoommate callback result: " + resultsRoommate[0].roommate_name);
+                                // make sure that the person that sent this text is the person is the person listed on the chore rotation
+                                if(req.body.From === resultsRoommate[0].roommate_phone_number)
+                                {
+                                    console.log("phone numbers match! marking chore as done.");
+                                    console.log (`total roommates: ${numberOfRoommates} current rotation number ${resultsChore.next_roommate}`);
+                                    // increments the next roommate rotation in chores by 1. If the current number is the last roommate in the rotation, reset next rotation to 1
+                                    if(numberOfRoommates <= resultsChore.next_roommate){
+                                        updateChoreRotation (db, receivedText, 1, () => {
+                                            console.log("reset next roommate to 1");
+                                        })
+                                    }
+                                    else{
+                                        var updatedRotation = Number(resultsChore.next_roommate) + 1;
+                                        console.log("this will be the next rotation" + updatedRotation);
+                                        updateChoreRotation(db, receivedText, updatedRotation, () =>{
+                                            console.log("set next roommate to next " + updatedRotation);
+                                        })
+                                    }                      
+
+                                                                    textRoommate(req.body.From, "!!!! Error. You are not currently on the rotation for !!!" + receivedText);
+                                    textRoommate(req.body.From, "Thank you! " + receivedText + " has been marked as finished!");
+
+                                }
+                                else
+                                {
+                                    textRoommate(req.body.From, `!!!! Error. You are not currently on the rotation for ${receivedText} !!!`);
+                                }
+                            })
+                       });
+                    })
+                }
+                else{
+                    console.log( `received message from ${req.body.From}`);
+                    textRoommate(req.body.From, 'Invalid response! Please use the previous text\'s done phrase when finished with your chore');
+                }
+           });
+            console.log(stringCompare);
+        }
     })
 
 
