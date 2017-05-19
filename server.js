@@ -121,9 +121,10 @@
 // Purpose: Updates the next_roommate attribute to the next roommate that needs to do the chore.
     var updateChoreRotation = function (db, chore, rotationNumber, callback){
         var collection = db.collection('chores');
+        var dateToday = new Date();
         collection.updateOne({'chore_name': chore}, {$set: {'next_roommate' : rotationNumber}});
+        collection.updateOne({'chore_name': chore}, {$set: {'date_last_cleaned' : dateToday}});    
         callback();
-
     } 
 
     // receive text message
