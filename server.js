@@ -238,7 +238,7 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('05 13 * * *', () =>{
+     cron.schedule ('15 21 * * *', () =>{
 
         MongoClient.connect(url, (err, db) => {
             assert.equal(null, err);
