@@ -229,6 +229,9 @@
 
     // listen (start app with node server.js) ======================================
     app.listen(8080);
+    // list time and date
+    var currentTime = new Date();
+    console.log(`Current time is: ${currentTime}`);
 
     // var roommateID = '590a40416e10ca9304bf48eb';
     // Starts up scheduler that checks when a chore is supposed to be done and texts roommate. 
