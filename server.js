@@ -238,8 +238,9 @@
     // Needs to check every day and message them until it is done.
     // Then it resets the cleaning counter for that chore
     // Then adds the next person.
-     cron.schedule ('15 21 * * *', () =>{
+     cron.schedule ('33 18 * * *', () =>{
 
+        console.log('running scheduler');
         MongoClient.connect(url, (err, db) => {
             assert.equal(null, err);
             var collection = db.collection('chores');
@@ -277,16 +278,13 @@
             textRoommate(roommateResult[0].roommate_phone_number,`***Beep Boop*** ${roommateResult[0].roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
             textRoommate('+15039614746',`***Beep Boop*** ${roommateResult[0].roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
         });
-        // roommate.findOne({'rotation_number': roommateRotation}, (err, person) =>{ //using the rotation number, find the phone number of the roommate that needs chore done.
-        //     if (err) return callback(err);
-        //     textRoommate(person.roommate_phone_number,`***Beep Boop*** ${person.roommate_name} it's your turn to do the ${choreName}. Reply "${choreName}" when you are done! *** Beep Boop ***`);
 
-        // });
     }
 // Input: string with telephone number structured as '+********', string with intended text message
 // Output: contacts Twilio API and sends out text message to recipient and message.
 // Purpose: sends a text message informing roommate that their chore is due.
     function textRoommate(roommate, message){
+        console.log (`texting ${message}`);
             client.messages.create({
                 body: message,
                 to: roommate,  // Text this number
